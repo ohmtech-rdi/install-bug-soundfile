@@ -1,0 +1,55 @@
+name: Workflow
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  windows:
+    name: Windows 2019
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - run: pip install soundfile
+      - run: python test.py
+      - run: ./test.py
+
+  windows_bash:
+    name: Windows 2019 Bash
+    runs-on: windows-2019
+    defaults:
+      run:
+        shell: bash -l {0} # Source profile for each step
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+          architecture: 'x64'
+      - run: pip install soundfile
+      - run: python test.py
+      - run: ./test.py
+
+  windows_bash_msys2:
+    name: Windows 2019 Bash MSYS2
+    runs-on: windows-2019
+    defaults:
+      run:
+        shell: bash -l {0} # Source profile for each step
+    steps:
+      - uses: actions/checkout@v2
+      - uses: msys2/setup-msys2@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+          architecture: 'x64'
+      - run: echo "c:/msys64/mingw64/bin" | Out-File -FilePath $env:GITHUB_PATH
+        shell: powershell
+      - run: ls -l c:/msys64/mingw64/bin/
+      - run: rm c:/msys64/mingw64/bin/python*
+      - run: pip install soundfile
+      - run: python test.py
+      - run: ./test.py
